@@ -4,7 +4,7 @@
 	"description": "A REST API project, part of Free Code Camp's curriculum",
 	"main": "server.js",
 	"scripts": {
-		"start": "node server.js"
+		"start": "nodemon server.js"
 	},
 	"dependencies": {
 		"express": "^4.14.0",
@@ -13,6 +13,9 @@
 		"body-parser": "^1.15.2",
 		"cors": "^2.8.1",
 		"shortid": "^2.2.6"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.3"
 	},
 	"engines": {
 		"node": "6.9.1"
