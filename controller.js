@@ -41,7 +41,7 @@ app.post("/api/exercise/add", (req, res)=>{
             .then(result =>{
                 user.exercise.push(result)
                 user.save()
-                res.status(201).json({username: user.username, description: exerciseDetail.description , duration: exerciseDetail.duration , _id:exerciseDetail.userId, date: exerciseDetail.date})
+                res.status(201).json({username: user.username, _id: user._id, description: result.description , duration: result.duration ,  date: new Date(result.date).toDateString()})
             })
             .catch(err =>{
                 res.status(401).json({err})
@@ -69,37 +69,29 @@ app.get("/api/exercise/users", (req,res)=>{
 })
 
 app.get("/api/exercise/log", (req,res)=>{
-    let from = req.query.from
-    let to = req.query.to
-    let limit = req.query.limit
     userModel.findById(req.query.userId)
     .then(user=>{
         let FetchedExercises = user.exercise
-        let FetchedExercisesLength = FetchedExercises.length
-        if (from){
+        if (req.query.from){
             FetchedExercises = FetchedExercises.filter(exercise =>{
-                exercise.date.getTime() > new Date(from).getTime()
+                exercise.date.getTime() > new Date(req.query.from).getTime()
             })
         }
-        if (to) {
+        if (req.query.to) {
             FetchedExercises = FetchedExercises.filter(exercise =>{
-                exercise.date.getTime() < new Date(to).getTime()
+                exercise.date.getTime() < new Date(req.query.to).getTime()
             })
         }
-        if (limit) {
+        if (req.query.limit) {
             FetchedExercises = FetchedExercises
-            .slice(0, limit > FetchedExercisesLength ? FetchedExercisesLength : limit )
+            .slice(0, req.query.limit > FetchedExercises.length ? FetchedExercises.length : req.query.limit )
         }
         user.exercise = FetchedExercises
         let tempUser = user.toJSON()
-        tempUser["totalExercise"] = FetchedExercisesLength
         tempUser["count"] = FetchedExercises.length
         return tempUser
     })
     .then(result => res.json(result))
-    .catch(err =>{
-        res.json({err})
-    })
+    .catch(err => res.json(err))
 })
-
 module.exports = app
