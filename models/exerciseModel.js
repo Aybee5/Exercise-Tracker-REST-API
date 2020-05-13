@@ -26,8 +26,9 @@ const exerciseSchema = Schema({
   },
   date: {
       type: Date,
-      default: new Date().toUTCString()
-  }
+    default: Date.now
+    }
+  
 })
 
 

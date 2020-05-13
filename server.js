@@ -6,7 +6,7 @@ const controller = require("./controller")
 const cors = require('cors')
 
 const mongoose = require('mongoose')
-mongoose.connect(process.env.MONGO_URL|| "mongodb://127.0.0.1:27017", {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(process.env.MLAB_URI|| "mongodb://127.0.0.1:27017", {useNewUrlParser: true, useUnifiedTopology: true});
 
 app.use(cors())
 
