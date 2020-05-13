@@ -28,17 +28,20 @@ app.post("/api/exercise/add", (req, res)=>{
     userModel.findOne({_id: req.body.userId})
     .then(user=>{
         if(user){
-            exerciseDetail = {
+            let exerciseDetail = {
                 userId : req.body.userId,
                 description : req.body.description,
                 duration: req.body.duration,
                 date: req.body.date
             }
+            if(!(exerciseDetail.date)) {
+              exerciseDetail.date = new Date().toDateString()
+            }
             exerciseModel.create(exerciseDetail)
             .then(result =>{
                 user.exercise.push(result)
                 user.save()
-                res.status(201).json({result,user})
+                res.status(201).json({username: user.username, description: exerciseDetail.description , duration: exerciseDetail.duration , _id:exerciseDetail.userId, date: exerciseDetail.date})
             })
             .catch(err =>{
                 res.status(401).json({err})
@@ -55,9 +58,10 @@ app.post("/api/exercise/add", (req, res)=>{
 
 app.get("/api/exercise/users", (req,res)=>{
     userModel.find()
-    .populate("exercise", "-_id")
+    .select("username _id")
+    // .populate("exercise", "-_id")
     .then(result=>{
-        res.status(200).json({result})
+        res.status(200).json(result)
     })
     .catch(err=>{
         res.status(404).json({err})
