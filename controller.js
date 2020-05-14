@@ -69,29 +69,25 @@ app.get("/api/exercise/users", (req,res)=>{
 })
 
 app.get("/api/exercise/log", (req,res)=>{
+    if (!req.query.userId){
+        res.json({err: "You must specify a userId in req.query"})
+    }
     userModel.findById(req.query.userId)
+    .populate("exercise")
     .then(user=>{
-        let FetchedExercises = user.exercise
+        let newLog = user.exercise;
         if (req.query.from){
-            FetchedExercises = FetchedExercises.filter(exercise =>{
-                exercise.date.getTime() > new Date(req.query.from).getTime()
-            })
-        }
-        if (req.query.to) {
-            FetchedExercises = FetchedExercises.filter(exercise =>{
-                exercise.date.getTime() < new Date(req.query.to).getTime()
-            })
-        }
-        if (req.query.limit) {
-            FetchedExercises = FetchedExercises
-            .slice(0, req.query.limit > FetchedExercises.length ? FetchedExercises.length : req.query.limit )
-        }
-        user.exercise = FetchedExercises
-        let tempUser = user.toJSON()
-        tempUser["count"] = FetchedExercises.length
-        return tempUser
+          newLog = newLog.filter( x =>  x.date.getTime() > new Date(req.query.from).getTime() );}
+        if (req.query.to)
+          newLog = newLog.filter( x => x.date.getTime() < new Date(req.query.to).getTime());
+        if (req.query.limit)
+          newLog = newLog.slice(0, req.query.limit > newLog.length ? newLog.length : req.query.limit);
+        user.exercise = newLog;
+        let temp = user.toJSON();
+        temp['count'] = newLog.length;
+        return temp
     })
-    .then(result => res.json(result))
+    .then(result => res.json({log:result.exercise, _id:result._id, username: result.username, count: result.count}))
     .catch(err => res.json(err))
 })
 module.exports = app
